@@ -30,5 +30,3 @@ The version JSON file should contain the latest version number of your game and 
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-You can customize this README.md file to suit your needs, including adding more information about your specific game and how to use the updater with it.
