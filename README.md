@@ -12,7 +12,7 @@ The Online Game Updater is a tool for keeping your game up-to-date with the late
 
 ## Getting Started
 
-To use the Online Game Updater in your game, simply download the latest release from the [releases page](https://github.com/your-username/online-game-updater/releases) and extract it to your game directory.
+To use the Online Game Updater in your game, simply download the latest release from the [releases page](https://github.com/ludiam/LegionLauncher/releases) and extract it to your game directory.
 
 Then, edit the `VersionUrl` constant in `Updater.cs` to point to the URL of your version JSON file on your server.
 
