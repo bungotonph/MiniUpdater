@@ -8,19 +8,25 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using SevenZip;
+using System.Threading.Tasks;
+using System.ComponentModel;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Reflection.Emit;
+using System.Threading;
 
 namespace GameUpdater
 {
     public partial class MainForm : Form
     {
         private const string FileHashesPath = "file_hashes.json";
-        private const string FileHashesUrl = "http://localhost/game/file_hashes.json";
-        private const string GameUrl = "http://localhost/game/data";
-        private const string VersionUrl = "http://localhost/game/version.json";
-        private const string ArchiveUrl = "http://localhost/game/cabalmain.7z";
+        private const string FileHashesUrl = "http://51.79.158.143/game/file_hashes.json";
+        private const string GameDir = ".";
+        private const string GameUrl = "http://51.79.158.143/game/";
+        private const string VersionUrl = "http://51.79.158.143/game/version.json";
+        private const string ArchiveUrl = "http://51.79.158.143/game/cabalmain.7z";
         private const string ArchiveFilename = "cabalmain.7z";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
-        private string VersionFilePath = "version.json";
+        private readonly string VersionFilePath = "version.json";
         private const string Password = "123";
 
         //private string CurrentVersion;
@@ -35,11 +41,10 @@ namespace GameUpdater
         {
             CheckForUpdates();
         }
-
         private void CheckForUpdates()
         {
             try
-            {   
+            {
                 // Update local file list from server
                 UpdateLocalFileListFromServer();
 
@@ -65,6 +70,7 @@ namespace GameUpdater
 
                         if (result == DialogResult.Yes)
                         {
+                            // Download and extract game archive
                             DownloadAndExtractGameArchive();
                             currentVersionInfo = latestVersionInfo;
 
@@ -77,9 +83,11 @@ namespace GameUpdater
                         }
                     }
                     else
-                    {
-                        MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
-                            "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    {   progressBar.Value = 100;
+                        LabelVersionLatest.Text = $"You have the latest version (version {currentVersionInfo.LatestVersion}).";
+                        BTNStart.Enabled = true;
+                        //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
+                        //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
@@ -93,7 +101,6 @@ namespace GameUpdater
         {
             try
             {
-
                 // Create a temporary file to store the downloaded archive
                 string tempFilePath = Path.Combine(Path.GetTempPath(), ArchiveFilename);
 
@@ -105,18 +112,18 @@ namespace GameUpdater
 
                 // Extract the archive
                 SevenZipBase.SetLibraryPath(Path.Combine(Application.StartupPath, "7z.dll"));
-                //SevenZip.SevenZipExtractor extractor = new SevenZip.SevenZipExtractor(tempFilePath);
-                //extractor.ExtractArchive(ExtractPath);
+                SevenZipExtractor extractor = new SevenZipExtractor(tempFilePath, Password);
 
-                using (var archive = new SevenZipExtractor(tempFilePath, Password))
+                extractor.Extracting += (sender, e) =>
                 {
-                    archive.ExtractArchive(ExtractPath);
-                }
+                    progressBar.Invoke((MethodInvoker)delegate { progressBar.Value = (int)((double)e.PercentDone / 100 * 100); });
+                    LabelVersionLatest.Invoke((MethodInvoker)delegate { LabelVersionLatest.Text = "Extracting game files... " + e.PercentDone.ToString() + "%"; });
+                };
+
+                extractor.ExtractArchive(ExtractPath);
 
                 // Delete the temporary archive file
                 File.Delete(tempFilePath);
-
-                MessageBox.Show($"Game updated successfully.", "Update Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -130,12 +137,16 @@ namespace GameUpdater
             {
                 using (var client = new WebClient())
                 {
+                    // Download the file hashes JSON from the server
                     var fileHashesJson = client.DownloadString(FileHashesUrl);
+
+                    // Deserialize the JSON array of file hashes into a List<FileHash>
                     var fileHashes = JsonConvert.DeserializeObject<List<FileHash>>(fileHashesJson);
 
+                    // Loop through each file hash and check if it exists locally and if it has been modified
                     foreach (var fileHash in fileHashes)
                     {
-                        var filePath = Path.Combine(ExtractPath, fileHash.Path);
+                        var filePath = Path.Combine(GameDir, fileHash.Path);
 
                         if (File.Exists(filePath))
                         {
@@ -157,22 +168,79 @@ namespace GameUpdater
 
                     // Write updated file hashes to local file
                     var updatedFileHashesJson = JsonConvert.SerializeObject(fileHashes, Formatting.Indented);
-                    File.WriteAllText(FileHashesPath, updatedFileHashesJson);
+                    var tempFileHashesPath = FileHashesPath + ".tmp"; // use a temp file to avoid file locking issues
+                    File.WriteAllText(tempFileHashesPath, updatedFileHashesJson);
+                    File.Replace(tempFileHashesPath, FileHashesPath, null); // replace original file with temp file
                 }
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
                 MessageBox.Show($"Failed to update local file list from server: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        private void BTNCheckFiles_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Update local file list from server
+                UpdateLocalFileListFromServer();
+                BTNStart.Enabled = false;
 
+                using (var client = new WebClient())
+                {
+                    // Download the latest version info
+                    var latestVersionJson = client.DownloadString(VersionUrl);
+                    var latestVersionInfo = JsonConvert.DeserializeObject<VersionInfo>(latestVersionJson);
+
+                    // Load the local version info
+                    VersionInfo currentVersionInfo;
+                    using (var file = File.OpenText(VersionFilePath))
+                    {
+                        var serializer = new JsonSerializer();
+                        currentVersionInfo = (VersionInfo)serializer.Deserialize(file, typeof(VersionInfo));
+                    }
+
+                    // Compare versions and prompt to update if necessary
+                    if (currentVersionInfo == null || currentVersionInfo.LatestVersion != latestVersionInfo.LatestVersion)
+                    {
+                        var result = MessageBox.Show($"An update is available (version {latestVersionInfo.LatestVersion}). Would you like to download and install it now?",
+                            "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            // Download and extract game archive
+                            DownloadAndExtractGameArchive();
+                            currentVersionInfo = latestVersionInfo;
+
+                            // Save the updated version info to local file
+                            using (var file = File.CreateText(VersionFilePath))
+                            {
+                                var serializer = new JsonSerializer();
+                                serializer.Serialize(file, currentVersionInfo);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        progressBar.Value = 100;
+                        LabelVersionLatest.Text = $"You have the latest version (version {currentVersionInfo.LatestVersion}).";
+                        BTNStart.Enabled = true;
+                        //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
+                        //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 
     public class VersionInfo
     {
         public string LatestVersion { get; set; }
-        public List<FileInfo> Files { get; set; }
     }
     public class FileHash
     {

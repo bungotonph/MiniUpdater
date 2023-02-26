@@ -28,25 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.labelVersion = new System.Windows.Forms.Label();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.LabelVersionLatest = new System.Windows.Forms.Label();
+            this.BTNCheckFiles = new System.Windows.Forms.Button();
+            this.BTNStart = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // labelVersion
+            // progressBar
             // 
-            this.labelVersion.AutoSize = true;
-            this.labelVersion.Location = new System.Drawing.Point(208, 113);
-            this.labelVersion.Name = "labelVersion";
-            this.labelVersion.Size = new System.Drawing.Size(0, 13);
-            this.labelVersion.TabIndex = 0;
+            this.progressBar.Location = new System.Drawing.Point(12, 68);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(356, 23);
+            this.progressBar.TabIndex = 1;
+            // 
+            // LabelVersionLatest
+            // 
+            this.LabelVersionLatest.AutoSize = true;
+            this.LabelVersionLatest.Location = new System.Drawing.Point(37, 42);
+            this.LabelVersionLatest.Name = "LabelVersionLatest";
+            this.LabelVersionLatest.Size = new System.Drawing.Size(0, 13);
+            this.LabelVersionLatest.TabIndex = 2;
+            // 
+            // BTNCheckFiles
+            // 
+            this.BTNCheckFiles.Location = new System.Drawing.Point(241, 112);
+            this.BTNCheckFiles.Name = "BTNCheckFiles";
+            this.BTNCheckFiles.Size = new System.Drawing.Size(127, 33);
+            this.BTNCheckFiles.TabIndex = 3;
+            this.BTNCheckFiles.Text = "Check Files";
+            this.BTNCheckFiles.UseVisualStyleBackColor = true;
+            this.BTNCheckFiles.Click += new System.EventHandler(this.BTNCheckFiles_Click);
+            // 
+            // BTNStart
+            // 
+            this.BTNStart.Enabled = false;
+            this.BTNStart.Location = new System.Drawing.Point(241, 151);
+            this.BTNStart.Name = "BTNStart";
+            this.BTNStart.Size = new System.Drawing.Size(127, 33);
+            this.BTNStart.TabIndex = 4;
+            this.BTNStart.Text = "Start";
+            this.BTNStart.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(586, 367);
-            this.Controls.Add(this.labelVersion);
+            this.ClientSize = new System.Drawing.Size(380, 207);
+            this.Controls.Add(this.BTNStart);
+            this.Controls.Add(this.BTNCheckFiles);
+            this.Controls.Add(this.LabelVersionLatest);
+            this.Controls.Add(this.progressBar);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "Legion Launcher";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -54,8 +87,10 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Label labelVersion;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label LabelVersionLatest;
+        private System.Windows.Forms.Button BTNCheckFiles;
+        private System.Windows.Forms.Button BTNStart;
     }
 }
 

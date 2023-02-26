@@ -41,8 +41,9 @@ using Newtonsoft.Json;
 
             // Serialize the dictionary as JSON and write it to a file
             string json = JsonConvert.SerializeObject(fileHashes, Formatting.Indented);
-            File.WriteAllText("file_hashes.json", json);
-        }
+            string filePath = Path.Combine(rootDirectory, "file_hashes.json");
+            File.WriteAllText(filePath, json);
+    }
 
         // Computes the SHA256 hash of a file
         static string ComputeFileHash(string filePath)
