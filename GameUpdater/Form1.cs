@@ -14,23 +14,27 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Drawing;
+using System.Diagnostics;
+using WebServer;
 
 namespace GameUpdater
 {
     public partial class MainForm : Form
     {
         private const string FileHashesPath = "file_hashes.json";
-        private const string FileHashesUrl = "http://51.79.158.143/game/file_hashes.json";
+        private const string FileHashesUrl = "http://sbajo.net/game/file_hashes.json";
         private const string GameDir = ".";
-        private const string GameUrl = "http://51.79.158.143/game/";
-        private const string VersionUrl = "http://51.79.158.143/game/version.json";
-        private const string ArchiveUrl = "http://51.79.158.143/game/cabalmain.7z";
+        private const string GameUrl = "http://sbajo.net/game/";
+        private const string VersionUrl = "http://sbajo.net/game/version.json";
+        private const string ArchiveUrl = "http://sbajo.net/game/cabalmain.7z";
         private const string ArchiveFilename = "cabalmain.7z";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
         private readonly string VersionFilePath = "version.json";
         private const string Password = "123";
-        private System.Windows.Forms.Label lblServerStatus;
-
+        private readonly System.Windows.Forms.Label lblServerStatus;
+        private bool isDragging = false;
+        private Point lastCursor;
+        private Point lastForm;
         //private string CurrentVersion;
         //private string LatestVersion;
 
@@ -38,10 +42,13 @@ namespace GameUpdater
         {
             InitializeComponent();
 
-            lblServerStatus = new System.Windows.Forms.Label();
-            lblServerStatus.Text = "Offline";
-            lblServerStatus.AutoSize = true;
-            lblServerStatus.Location = new Point(85, 10);
+            lblServerStatus = new System.Windows.Forms.Label
+            {
+                Text = "Offline",
+                AutoSize = true,
+                Location = new Point(85, 65),
+                BackColor = Color.Transparent
+            };
 
             // Add the Label control to the form's controls collection
             this.Controls.Add(lblServerStatus);
@@ -57,6 +64,7 @@ namespace GameUpdater
             {
                 // Set the label's text to "Checking..."
                 lblServerStatus.Text = "Checking...";
+                lblServerStatus.BackColor = Color.Transparent;
 
                 // Update local file list from server
                 UpdateLocalFileListFromServer();
@@ -69,6 +77,7 @@ namespace GameUpdater
                     // Set the label's text to "Online" if no exceptions are caught
                     lblServerStatus.Text = "Online";
                     lblServerStatus.ForeColor = Color.Green;
+                    lblServerStatus.BackColor = Color.Transparent;
 
                     // Load the local version info
                     VersionInfo currentVersionInfo;
@@ -113,6 +122,7 @@ namespace GameUpdater
                 // Set the label's text to "Offline" if an exception is caught
                 lblServerStatus.Text = "Offline";
                 lblServerStatus.ForeColor = Color.Red;
+                lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -205,6 +215,7 @@ namespace GameUpdater
             {
                 // Set the label's text to "Checking..."
                 lblServerStatus.Text = "Checking...";
+                lblServerStatus.BackColor = Color.Transparent;
 
                 // Update local file list from server
                 UpdateLocalFileListFromServer();
@@ -219,6 +230,7 @@ namespace GameUpdater
                     // Set the label's text to "Online" if no exceptions are caught
                     lblServerStatus.Text = "Online";
                     lblServerStatus.ForeColor = Color.Green;
+                    lblServerStatus.BackColor = Color.Transparent;
 
                     // Load the local version info
                     VersionInfo currentVersionInfo;
@@ -264,9 +276,66 @@ namespace GameUpdater
                 // Set the label's text to "Online" if no exceptions are caught
                 lblServerStatus.Text = "Offline";
                 lblServerStatus.ForeColor = Color.Red;
+                lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void LaunchGame()
+        {
+            try
+            {
+                var process = new Process();
+                process.StartInfo.FileName = "cabalmain.exe";
+                process.StartInfo.Arguments = "sbajo";
+                process.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to launch game: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BTNStart_Click(object sender, EventArgs e)
+        {
+            LaunchGame();
+            Environment.Exit(0);
+        }
+
+        private void BTNClose_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(1);
+        }
+
+        private void Form_MouseDown(object sender, MouseEventArgs e)
+        {
+            isDragging = true;
+            lastCursor = Cursor.Position;
+            lastForm = this.Location;
+        }
+
+        private void Form_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging)
+            {
+                int xDiff = Cursor.Position.X - lastCursor.X;
+                int yDiff = Cursor.Position.Y - lastCursor.Y;
+
+                this.Location = new Point(lastForm.X + xDiff, lastForm.Y + yDiff);
+            }
+        }
+
+        private void Form_MouseUp(object sender, MouseEventArgs e)
+        {
+            isDragging = false;
+        }
+
+        /*
+        private void WebBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        {
+            // Set the user agent string to hide identifying information
+            webBrowser1.Navigate(e.Url, null, null, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0\r\n");
+        }*/
+
     }
 
     public class VersionInfo
