@@ -23,14 +23,14 @@ namespace GameUpdater
     {
         private const string FileHashesPath = "file_hashes.json";
         private const string FileHashesUrl = "http://sbajo.net/game/file_hashes.json";
-        private const string GameDir = ".";
-        private const string GameUrl = "http://sbajo.net/game/";
         private const string VersionUrl = "http://sbajo.net/game/version.json";
         private const string ArchiveUrl = "http://sbajo.net/game/cabalmain.7z";
         private const string ArchiveFilename = "cabalmain.7z";
+        private const string GameUrl = "http://sbajo.net/game/";
+        private const string GameDir = ".";
+        private const string Password = "123";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
         private readonly string VersionFilePath = "version.json";
-        private const string Password = "123";
         private readonly System.Windows.Forms.Label lblServerStatus;
         private bool isDragging = false;
         private Point lastCursor;
@@ -90,7 +90,7 @@ namespace GameUpdater
                     // Compare versions and prompt to update if necessary
                     if (currentVersionInfo == null || currentVersionInfo.LatestVersion != latestVersionInfo.LatestVersion)
                     {
-                        var result = MessageBox.Show($"An update is available (version {latestVersionInfo.LatestVersion}). Would you like to download and install it now?",
+                        var result = MessageBox.Show($"An update is available (Version {latestVersionInfo.LatestVersion}). Would you like to download and install it now?",
                             "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 
                         if (result == DialogResult.Yes)
@@ -249,7 +249,7 @@ namespace GameUpdater
                         if (result == DialogResult.Yes)
                         {
                             // Download and extract game archive
-                            DownloadAndExtractGameArchive();
+                            DownloadAndExtractGameArchive();                            
                             currentVersionInfo = latestVersionInfo;
 
                             // Save the updated version info to local file
@@ -295,10 +295,29 @@ namespace GameUpdater
             }
         }
 
-        private void BTNStart_Click(object sender, EventArgs e)
+        private void BTNStart_Click(object sender, MouseEventArgs e)
         {
+            BTNStart.BackgroundImage = Properties.Resources.startclick;
             LaunchGame();
             Environment.Exit(0);
+        }
+
+        private void BTNStart_MouseEnter(object sender, EventArgs e)
+        {
+            BTNStart.BackgroundImage = Properties.Resources.startnormal;
+        }
+
+        private void BTNStart_MouseLeave(object sender, EventArgs e)
+        {
+            BTNStart.BackgroundImage = Properties.Resources.startover;
+        }
+        private void BTNCF_MouseOver(object sender, EventArgs e)
+        {
+            BTNCheckFiles.BackgroundImage = Properties.Resources.cf_hover;
+        }
+        private void BTNCF_MouseEnter(object sender, EventArgs e)
+        {
+            BTNCheckFiles.BackgroundImage = Properties.Resources.cf_normal;
         }
 
         private void BTNClose_Click(object sender, EventArgs e)

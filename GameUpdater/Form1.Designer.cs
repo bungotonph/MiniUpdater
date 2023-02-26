@@ -42,9 +42,12 @@ namespace GameUpdater
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(83, 513);
+            this.progressBar.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.progressBar.ForeColor = System.Drawing.Color.Green;
+            this.progressBar.Location = new System.Drawing.Point(24, 501);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(521, 23);
+            this.progressBar.Size = new System.Drawing.Size(609, 31);
+            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar.TabIndex = 1;
             // 
             // LabelVersionLatest
@@ -52,31 +55,46 @@ namespace GameUpdater
             this.LabelVersionLatest.AutoSize = true;
             this.LabelVersionLatest.BackColor = System.Drawing.Color.Transparent;
             this.LabelVersionLatest.ForeColor = System.Drawing.Color.White;
-            this.LabelVersionLatest.Location = new System.Drawing.Point(547, 65);
+            this.LabelVersionLatest.Location = new System.Drawing.Point(21, 543);
             this.LabelVersionLatest.Name = "LabelVersionLatest";
             this.LabelVersionLatest.Size = new System.Drawing.Size(0, 13);
             this.LabelVersionLatest.TabIndex = 2;
             // 
             // BTNCheckFiles
             // 
-            this.BTNCheckFiles.Location = new System.Drawing.Point(660, 491);
+            this.BTNCheckFiles.AutoSize = true;
+            this.BTNCheckFiles.BackColor = System.Drawing.Color.Transparent;
+            this.BTNCheckFiles.BackgroundImage = global::GameUpdater.Properties.Resources.cf_normal;
+            this.BTNCheckFiles.FlatAppearance.BorderSize = 0;
+            this.BTNCheckFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTNCheckFiles.Location = new System.Drawing.Point(646, 537);
+            this.BTNCheckFiles.Margin = new System.Windows.Forms.Padding(0);
             this.BTNCheckFiles.Name = "BTNCheckFiles";
-            this.BTNCheckFiles.Size = new System.Drawing.Size(127, 33);
+            this.BTNCheckFiles.Size = new System.Drawing.Size(66, 19);
             this.BTNCheckFiles.TabIndex = 3;
-            this.BTNCheckFiles.Text = "Check Files";
-            this.BTNCheckFiles.UseVisualStyleBackColor = true;
+            this.BTNCheckFiles.UseVisualStyleBackColor = false;
             this.BTNCheckFiles.Click += new System.EventHandler(this.BTNCheckFiles_Click);
+            this.BTNCheckFiles.MouseEnter += new System.EventHandler(this.BTNCF_MouseEnter);
+            this.BTNCheckFiles.MouseLeave += new System.EventHandler(this.BTNCF_MouseOver);
+            this.BTNCheckFiles.MouseHover += new System.EventHandler(this.BTNCF_MouseOver);
             // 
             // BTNStart
             // 
+            this.BTNStart.AutoSize = true;
+            this.BTNStart.BackColor = System.Drawing.Color.Transparent;
+            this.BTNStart.BackgroundImage = global::GameUpdater.Properties.Resources.startover;
             this.BTNStart.Enabled = false;
-            this.BTNStart.Location = new System.Drawing.Point(660, 530);
+            this.BTNStart.FlatAppearance.BorderSize = 0;
+            this.BTNStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTNStart.Location = new System.Drawing.Point(646, 490);
+            this.BTNStart.Margin = new System.Windows.Forms.Padding(0);
             this.BTNStart.Name = "BTNStart";
-            this.BTNStart.Size = new System.Drawing.Size(127, 33);
+            this.BTNStart.Size = new System.Drawing.Size(136, 44);
             this.BTNStart.TabIndex = 4;
-            this.BTNStart.Text = "Start";
-            this.BTNStart.UseVisualStyleBackColor = true;
-            this.BTNStart.Click += new System.EventHandler(this.BTNStart_Click);
+            this.BTNStart.UseVisualStyleBackColor = false;
+            this.BTNStart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.BTNStart_Click);
+            this.BTNStart.MouseEnter += new System.EventHandler(this.BTNStart_MouseEnter);
+            this.BTNStart.MouseLeave += new System.EventHandler(this.BTNStart_MouseLeave);
             // 
             // label1
             // 

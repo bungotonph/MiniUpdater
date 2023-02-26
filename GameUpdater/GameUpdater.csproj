@@ -116,6 +116,15 @@
   <ItemGroup>
     <Content Include="7z.dll" />
     <Content Include="favicon.ico" />
+    <None Include="Resources\startover.png" />
+    <None Include="Resources\startnormal.png" />
+    <None Include="Resources\startclick.png" />
+    <None Include="Resources\opt_normal.png" />
+    <None Include="Resources\opt_hover.png" />
+    <None Include="Resources\close_normal.png" />
+    <None Include="Resources\close_hover.png" />
+    <None Include="Resources\cf_normal.png" />
+    <None Include="Resources\cf_hover.png" />
     <None Include="PHLauncher.png" />
   </ItemGroup>
   <ItemGroup>
