@@ -13,6 +13,7 @@ using System.ComponentModel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Reflection.Emit;
 using System.Threading;
+using System.Drawing;
 
 namespace GameUpdater
 {
@@ -28,6 +29,7 @@ namespace GameUpdater
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
         private readonly string VersionFilePath = "version.json";
         private const string Password = "123";
+        private System.Windows.Forms.Label lblServerStatus;
 
         //private string CurrentVersion;
         //private string LatestVersion;
@@ -35,6 +37,14 @@ namespace GameUpdater
         public MainForm()
         {
             InitializeComponent();
+
+            lblServerStatus = new System.Windows.Forms.Label();
+            lblServerStatus.Text = "Offline";
+            lblServerStatus.AutoSize = true;
+            lblServerStatus.Location = new Point(85, 10);
+
+            // Add the Label control to the form's controls collection
+            this.Controls.Add(lblServerStatus);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -45,6 +55,9 @@ namespace GameUpdater
         {
             try
             {
+                // Set the label's text to "Checking..."
+                lblServerStatus.Text = "Checking...";
+
                 // Update local file list from server
                 UpdateLocalFileListFromServer();
 
@@ -53,6 +66,9 @@ namespace GameUpdater
                     // Download the latest version info
                     var latestVersionJson = client.DownloadString(VersionUrl);
                     var latestVersionInfo = JsonConvert.DeserializeObject<VersionInfo>(latestVersionJson);
+                    // Set the label's text to "Online" if no exceptions are caught
+                    lblServerStatus.Text = "Online";
+                    lblServerStatus.ForeColor = Color.Green;
 
                     // Load the local version info
                     VersionInfo currentVersionInfo;
@@ -84,15 +100,19 @@ namespace GameUpdater
                     }
                     else
                     {   progressBar.Value = 100;
-                        LabelVersionLatest.Text = $"You have the latest version (version {currentVersionInfo.LatestVersion}).";
+                        LabelVersionLatest.Text = $"You have the latest version ({currentVersionInfo.LatestVersion}).";
                         BTNStart.Enabled = true;
+                        BTNCheckFiles.Enabled = false;
                         //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
                         //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception ex)
-            {
+            {        
+                // Set the label's text to "Offline" if an exception is caught
+                lblServerStatus.Text = "Offline";
+                lblServerStatus.ForeColor = Color.Red;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -183,6 +203,9 @@ namespace GameUpdater
         {
             try
             {
+                // Set the label's text to "Checking..."
+                lblServerStatus.Text = "Checking...";
+
                 // Update local file list from server
                 UpdateLocalFileListFromServer();
                 BTNStart.Enabled = false;
@@ -192,6 +215,10 @@ namespace GameUpdater
                     // Download the latest version info
                     var latestVersionJson = client.DownloadString(VersionUrl);
                     var latestVersionInfo = JsonConvert.DeserializeObject<VersionInfo>(latestVersionJson);
+
+                    // Set the label's text to "Online" if no exceptions are caught
+                    lblServerStatus.Text = "Online";
+                    lblServerStatus.ForeColor = Color.Green;
 
                     // Load the local version info
                     VersionInfo currentVersionInfo;
@@ -224,8 +251,9 @@ namespace GameUpdater
                     else
                     {
                         progressBar.Value = 100;
-                        LabelVersionLatest.Text = $"You have the latest version (version {currentVersionInfo.LatestVersion}).";
+                        LabelVersionLatest.Text = $"You have the latest version ({currentVersionInfo.LatestVersion}).";
                         BTNStart.Enabled = true;
+                        BTNCheckFiles.Enabled = false;
                         //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
                         //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -233,6 +261,9 @@ namespace GameUpdater
             }
             catch (Exception ex)
             {
+                // Set the label's text to "Online" if no exceptions are caught
+                lblServerStatus.Text = "Offline";
+                lblServerStatus.ForeColor = Color.Red;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

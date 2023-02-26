@@ -32,6 +32,7 @@
             this.LabelVersionLatest = new System.Windows.Forms.Label();
             this.BTNCheckFiles = new System.Windows.Forms.Button();
             this.BTNStart = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // progressBar
@@ -69,11 +70,21 @@
             this.BTNStart.Text = "Start";
             this.BTNStart.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(74, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Server Status:";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(380, 207);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.BTNStart);
             this.Controls.Add(this.BTNCheckFiles);
             this.Controls.Add(this.LabelVersionLatest);
@@ -91,6 +102,7 @@
         private System.Windows.Forms.Label LabelVersionLatest;
         private System.Windows.Forms.Button BTNCheckFiles;
         private System.Windows.Forms.Button BTNStart;
+        private System.Windows.Forms.Label label1;
     }
 }
 
