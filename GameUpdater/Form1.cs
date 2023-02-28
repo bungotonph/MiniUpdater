@@ -1,22 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using SevenZip;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Linq;
-using System.Text;
-using System.Security.Cryptography;
-using System.Collections.Generic;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using SevenZip;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Reflection.Emit;
-using System.Threading;
-using System.Drawing;
-using System.Diagnostics;
-using WebServer;
-using System.Windows.Forms.VisualStyles;
 
 namespace GameUpdater
 {
@@ -32,7 +22,7 @@ namespace GameUpdater
         private const string Password = "123";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
         private readonly string VersionFilePath = "version.json";
-        private readonly System.Windows.Forms.Label lblServerStatus;
+        private readonly Label lblServerStatus;
         private bool isDragging = false;
         private Point lastCursor;
         private Point lastForm;
@@ -42,7 +32,7 @@ namespace GameUpdater
         public MainForm()
         {
             InitializeComponent();
-            lblServerStatus = new System.Windows.Forms.Label
+            lblServerStatus = new Label
             {
                 Text = "Offline",
                 AutoSize = true,
@@ -56,8 +46,41 @@ namespace GameUpdater
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            // Check important directories
+            CheckMainDirectories();
+
+            // Automatic update checking
             CheckForUpdates();
+
+            // Update local file list from server
+            UpdateLocalFileListFromServer();
         }
+
+        private void CheckMainDirectories()
+        {
+            string GameData = "data";
+            string GameLang = GameData + "\\" + "language";
+            string GameEng = GameLang + "\\" + "english";
+            // Check if the game directory exists, if not, create it
+            if (!Directory.Exists(GameData) || !Directory.Exists(GameLang) || !Directory.Exists(GameEng))
+            {
+                var result = MessageBox.Show($"There are missing directories. Would you like to create them now?",
+                            "Missing Directories", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (result == DialogResult.Yes)
+                {
+                    Directory.CreateDirectory(GameData);
+                    Directory.CreateDirectory(GameLang);
+                    Directory.CreateDirectory(GameEng);
+                }
+                else
+                {
+                    MessageBox.Show($"You cannot run the game without those important directories!",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(1);
+                }
+            }
+        }
+
         private void CheckForUpdates()
         {
             try
@@ -66,14 +89,12 @@ namespace GameUpdater
                 lblServerStatus.Text = "Checking...";
                 lblServerStatus.BackColor = Color.Transparent;
 
-                // Update local file list from server
-                UpdateLocalFileListFromServer();
-
                 using (var client = new WebClient())
                 {
                     // Download the latest version info
                     var latestVersionJson = client.DownloadString(VersionUrl);
                     var latestVersionInfo = JsonConvert.DeserializeObject<VersionInfo>(latestVersionJson);
+
                     // Set the label's text to "Online" if no exceptions are caught
                     lblServerStatus.Text = "Online";
                     lblServerStatus.ForeColor = Color.Green;
@@ -108,7 +129,8 @@ namespace GameUpdater
                         }
                     }
                     else
-                    {   progressBar.Value = 100;
+                    {
+                        progressBar.Value = 100;
                         LabelVersionLatest.Text = $"You have the latest version ({currentVersionInfo.LatestVersion}).";
                         BTNStart.Enabled = true;
                         BTNCheckFiles.Enabled = false;
@@ -118,7 +140,7 @@ namespace GameUpdater
                 }
             }
             catch (Exception ex)
-            {        
+            {
                 // Set the label's text to "Offline" if an exception is caught
                 lblServerStatus.Text = "Offline";
                 lblServerStatus.ForeColor = Color.Red;
@@ -220,23 +242,26 @@ namespace GameUpdater
                     File.Replace(tempFileHashesPath, FileHashesPath, null); // replace original file with temp file
                 }
             }
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Failed to update local file list from server: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 webBrowser1.Visible = false;
+                BTNStart.Enabled = false;
+                BTNCheckFiles.Enabled = true;
             }
         }
 
         private void BTNCheckFiles_Click(object sender, EventArgs e)
         {
+            // Update local file list from server
+            UpdateLocalFileListFromServer();
+
             try
             {
                 // Set the label's text to "Checking..."
                 lblServerStatus.Text = "Checking...";
                 lblServerStatus.BackColor = Color.Transparent;
 
-                // Update local file list from server
-                UpdateLocalFileListFromServer();
                 BTNStart.Enabled = false;
 
                 using (var client = new WebClient())
@@ -267,7 +292,7 @@ namespace GameUpdater
                         if (result == DialogResult.Yes)
                         {
                             // Download and extract game archive
-                            DownloadAndExtractGameArchive();                            
+                            DownloadAndExtractGameArchive();
                             currentVersionInfo = latestVersionInfo;
 
                             // Save the updated version info to local file
@@ -386,13 +411,6 @@ namespace GameUpdater
         {
             isDragging = false;
         }
-
-        /*
-        private void WebBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
-        {
-            // Set the user agent string to hide identifying information
-            webBrowser1.Navigate(e.Url, null, null, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0\r\n");
-        }*/
 
     }
 
