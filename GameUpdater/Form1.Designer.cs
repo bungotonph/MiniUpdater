@@ -130,7 +130,7 @@ namespace GameUpdater
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = global::GameUpdater.Properties.Resources.PHLauncher;
+            this.ClientSize = new System.Drawing.Size(799, 630);
             this.ClientSize = new System.Drawing.Size(799, 604);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.BTNClose);
@@ -159,7 +159,6 @@ namespace GameUpdater
         private System.Windows.Forms.Button BTNCheckFiles;
         private System.Windows.Forms.Button BTNStart;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button BTNClose;
         private System.Windows.Forms.WebBrowser webBrowser1;
     }
 }
