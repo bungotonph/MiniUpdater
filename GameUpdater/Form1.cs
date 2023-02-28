@@ -16,17 +16,18 @@ using System.Threading;
 using System.Drawing;
 using System.Diagnostics;
 using WebServer;
+using System.Windows.Forms.VisualStyles;
 
 namespace GameUpdater
 {
     public partial class MainForm : Form
     {
         private const string FileHashesPath = "file_hashes.json";
-        private const string FileHashesUrl = "http://sbajo.net/game/file_hashes.json";
-        private const string VersionUrl = "http://sbajo.net/game/version.json";
-        private const string ArchiveUrl = "http://sbajo.net/game/cabalmain.7z";
+        private const string FileHashesUrl = "http://localhost/game/file_hashes.json";
+        private const string VersionUrl = "http://localhost/game/version.json";
+        private const string ArchiveUrl = "http://localhost/game/cabalmain.7z";
         private const string ArchiveFilename = "cabalmain.7z";
-        private const string GameUrl = "http://sbajo.net/game/";
+        private const string GameUrl = "http://localhost/game/";
         private const string GameDir = ".";
         private const string Password = "123";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
@@ -41,7 +42,6 @@ namespace GameUpdater
         public MainForm()
         {
             InitializeComponent();
-
             lblServerStatus = new System.Windows.Forms.Label
             {
                 Text = "Offline",
@@ -124,6 +124,7 @@ namespace GameUpdater
                 lblServerStatus.ForeColor = Color.Red;
                 lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                webBrowser1.Visible = false;
             }
         }
 
@@ -146,7 +147,22 @@ namespace GameUpdater
 
                 extractor.Extracting += (sender, e) =>
                 {
-                    progressBar.Invoke((MethodInvoker)delegate { progressBar.Value = (int)((double)e.PercentDone / 100 * 100); });
+                    progressBar.Invoke((MethodInvoker)delegate
+                    {
+                        int value = (int)((double)e.PercentDone / 100 * 100);
+                        progressBar.Value = value;
+                        // Change the color of the progress bar based on the value
+                        Color color = Color.FromArgb(255, value, 0, 255 - value);
+                        //progressBar.SetState(2);
+                        //progressBar.SetState(1);
+                        //progressBar.SetState(3);
+                        //progressBar.SetState(2);
+                        //progressBar.SetState(1);
+                        //progressBar.SetState(3);
+                        progressBar.BackColor = color;
+                    });
+
+                    //progressBar.Invoke((MethodInvoker)delegate { progressBar.Value = (int)((double)e.PercentDone / 100 * 100); });
                     LabelVersionLatest.Invoke((MethodInvoker)delegate { LabelVersionLatest.Text = "Extracting game files... " + e.PercentDone.ToString() + "%"; });
                 };
 
@@ -158,6 +174,7 @@ namespace GameUpdater
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to update: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                webBrowser1.Visible = false;
             }
         }
 
@@ -206,6 +223,7 @@ namespace GameUpdater
             catch (WebException ex)
             {
                 MessageBox.Show($"Failed to update local file list from server: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                webBrowser1.Visible = false;
             }
         }
 
@@ -278,6 +296,7 @@ namespace GameUpdater
                 lblServerStatus.ForeColor = Color.Red;
                 lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                webBrowser1.Visible = false;
             }
         }
         private void LaunchGame()
@@ -297,20 +316,32 @@ namespace GameUpdater
 
         private void BTNStart_Click(object sender, MouseEventArgs e)
         {
-            BTNStart.BackgroundImage = Properties.Resources.startclick;
+            BTNStart.BackgroundImage = Properties.Resources.start_hover;
+            BTNStart.BackColor = Color.Transparent;
             LaunchGame();
             Environment.Exit(0);
         }
 
         private void BTNStart_MouseEnter(object sender, EventArgs e)
         {
-            BTNStart.BackgroundImage = Properties.Resources.startnormal;
+            BTNStart.BackgroundImage = Properties.Resources.start_hover;
         }
 
         private void BTNStart_MouseLeave(object sender, EventArgs e)
         {
-            BTNStart.BackgroundImage = Properties.Resources.startover;
+            BTNStart.BackgroundImage = Properties.Resources.start_normal;
         }
+        private void BTNStart_MouseOver(object sender, EventArgs e)
+        {
+            BTNStart.BackgroundImage = Properties.Resources.start_hover;
+            BTNStart.Cursor = Cursors.Hand;
+        }
+
+        private void BTNStart_BackColor(object sender, EventArgs e)
+        {
+            BTNStart.BackColor = Color.Transparent;
+        }
+
         private void BTNCF_MouseOver(object sender, EventArgs e)
         {
             BTNCheckFiles.BackgroundImage = Properties.Resources.cf_hover;
@@ -323,6 +354,14 @@ namespace GameUpdater
         private void BTNClose_Click(object sender, EventArgs e)
         {
             Environment.Exit(1);
+        }
+        private void BTNClose_MouseLeave(object sender, EventArgs e)
+        {
+            BTNClose.BackgroundImage = Properties.Resources.close_hover;
+        }
+        private void BTNClose_MouseEnter(object sender, EventArgs e)
+        {
+            BTNClose.BackgroundImage = Properties.Resources.close_normal;
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)

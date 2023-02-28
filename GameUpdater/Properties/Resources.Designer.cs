@@ -63,6 +63,16 @@ namespace GameUpdater.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bottomOverlay {
+            get {
+                object obj = ResourceManager.GetObject("bottomOverlay", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap cf_hover {
             get {
                 object obj = ResourceManager.GetObject("cf_hover", resourceCulture);
@@ -103,6 +113,16 @@ namespace GameUpdater.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Legion {
+            get {
+                object obj = ResourceManager.GetObject("Legion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap opt_hover {
             get {
                 object obj = ResourceManager.GetObject("opt_hover", resourceCulture);
@@ -123,9 +143,19 @@ namespace GameUpdater.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PHLauncher {
+        internal static System.Drawing.Bitmap start_hover {
             get {
-                object obj = ResourceManager.GetObject("PHLauncher", resourceCulture);
+                object obj = ResourceManager.GetObject("start_hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap start_normal {
+            get {
+                object obj = ResourceManager.GetObject("start_normal", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
