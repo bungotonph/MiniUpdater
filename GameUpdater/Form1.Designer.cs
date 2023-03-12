@@ -166,6 +166,7 @@ namespace GameUpdater
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form_MouseUp);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -176,7 +177,6 @@ namespace GameUpdater
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.WebBrowser webBrowser1;
         private Button BTNClose;
-
     }
 }
 

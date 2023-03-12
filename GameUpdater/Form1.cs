@@ -13,11 +13,11 @@ namespace GameUpdater
     public partial class MainForm : Form
     {
         private const string FileHashesPath = "file_hashes.json";
-        private const string FileHashesUrl = "http://localhost/game/file_hashes.json";
-        private const string VersionUrl = "http://localhost/game/version.json";
-        private const string ArchiveUrl = "http://localhost/game/cabalmain.7z";
+        private const string FileHashesUrl = "http://localhost/update/file_hashes.json";
+        private const string VersionUrl = "http://localhost/update/version.json";
+        private const string ArchiveUrl = "http://localhost/update/cabalmain.7z";
         private const string ArchiveFilename = "cabalmain.7z";
-        private const string GameUrl = "http://localhost/game/";
+        private const string GameUrl = "http://localhost/update/";
         private const string GameDir = ".";
         private const string Password = "123";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
@@ -71,6 +71,8 @@ namespace GameUpdater
                     Directory.CreateDirectory(GameData);
                     Directory.CreateDirectory(GameLang);
                     Directory.CreateDirectory(GameEng);
+                    MessageBox.Show($"All directories has been created Successfully!",
+                            "Directories Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
