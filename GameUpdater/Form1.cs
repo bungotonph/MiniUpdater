@@ -36,7 +36,7 @@ namespace GameUpdater
             {
                 Text = "Offline",
                 AutoSize = true,
-                Location = new Point(85, 65),
+                Location = new Point(85, 160),
                 BackColor = Color.Transparent
             };
 

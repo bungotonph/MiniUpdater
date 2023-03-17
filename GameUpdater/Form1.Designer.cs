@@ -46,7 +46,7 @@ namespace GameUpdater
             this.progressBar.ForeColor = System.Drawing.Color.Green;
             this.progressBar.Location = new System.Drawing.Point(0, 0);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(404, 12);
+            this.progressBar.Size = new System.Drawing.Size(397, 12);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar.TabIndex = 1;
             // 
@@ -62,11 +62,10 @@ namespace GameUpdater
             // 
             // BTNCheckFiles
             // 
-            this.BTNCheckFiles.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BTNCheckFiles.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.BTNCheckFiles.Cursor = System.Windows.Forms.Cursors.Hand;
             this.BTNCheckFiles.FlatAppearance.BorderSize = 0;
-            this.BTNCheckFiles.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.BTNCheckFiles.Location = new System.Drawing.Point(320, 183);
+            this.BTNCheckFiles.Location = new System.Drawing.Point(320, 176);
             this.BTNCheckFiles.Margin = new System.Windows.Forms.Padding(0);
             this.BTNCheckFiles.Name = "BTNCheckFiles";
             this.BTNCheckFiles.Size = new System.Drawing.Size(72, 23);
@@ -80,7 +79,7 @@ namespace GameUpdater
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.ForeColor = System.Drawing.Color.Black;
-            this.label1.Location = new System.Drawing.Point(12, 144);
+            this.label1.Location = new System.Drawing.Point(12, 160);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(74, 13);
             this.label1.TabIndex = 5;
@@ -88,10 +87,9 @@ namespace GameUpdater
             // 
             // StartButton
             // 
-            this.StartButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.StartButton.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.StartButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.StartButton.FlatAppearance.BorderSize = 0;
-            this.StartButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.StartButton.Location = new System.Drawing.Point(260, 125);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(132, 50);
@@ -105,7 +103,7 @@ namespace GameUpdater
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(404, 220);
+            this.ClientSize = new System.Drawing.Size(397, 205);
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BTNCheckFiles);
@@ -117,7 +115,7 @@ namespace GameUpdater
             this.MinimizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Legion Launcher";
+            this.Text = "Mini Updater";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form_MouseMove);
