@@ -13,11 +13,11 @@ namespace GameUpdater
     public partial class MainForm : Form
     {
         private const string FileHashesPath = "file_hashes.json";
-        private const string FileHashesUrl = "http://localhost/update/file_hashes.json";
-        private const string VersionUrl = "http://localhost/update/version.json";
-        private const string ArchiveUrl = "http://localhost/update/cabalmain.7z";
-        private const string ArchiveFilename = "cabalmain.7z";
-        private const string GameUrl = "http://localhost/update/";
+        private const string FileHashesUrl = "https://sbajo.net/public/update-url/file_hashes.json";
+        private const string VersionUrl = "https://sbajo.net/public/update-url/version.json";
+        private const string ArchiveUrl = "https://sbajo.net/public/update-url/updates/update_1.7z";
+        private const string ArchiveFilename = "update_1.7z";
+        private const string GameUrl = "https://sbajo.net/public/update-url/";
         private const string GameDir = ".";
         private const string Password = "123";
         private readonly string ExtractPath = Path.Combine(Application.StartupPath, ".");
@@ -76,9 +76,28 @@ namespace GameUpdater
                 }
                 else
                 {
-                    MessageBox.Show($"You cannot run the game without those important directories!",
+                    MessageBox.Show($"You cannot run the game without those game directories!",
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Environment.Exit(1);
+                }
+            }
+
+            if (!File.Exists(VersionFilePath) || !File.Exists(FileHashesPath))
+            {
+                // Create a new version JSON file if it doesn't exist
+                if (!File.Exists(VersionFilePath))
+                {
+                    var versionData = new { Version = "1.0" };
+                    var versionJson = JsonConvert.SerializeObject(versionData, Formatting.Indented);
+                    File.WriteAllText(VersionFilePath, versionJson);
+                }
+
+                // Create a new file hashes JSON file if it doesn't exist
+                if (!File.Exists(FileHashesPath))
+                {
+                    var fileHashesData = new { NumFiles = 0, FileHashes = new List<FileHash>() };
+                    var fileHashesJson = JsonConvert.SerializeObject(fileHashesData, Formatting.Indented);
+                    File.WriteAllText(FileHashesPath, fileHashesJson);
                 }
             }
         }
@@ -134,10 +153,8 @@ namespace GameUpdater
                     {
                         progressBar.Value = 100;
                         LabelVersionLatest.Text = $"You have the latest version ({currentVersionInfo.LatestVersion}).";
-                        BTNStart.Enabled = true;
+                        //BTNStart.Enabled = true;
                         BTNCheckFiles.Enabled = false;
-                        //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
-                        //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
@@ -148,7 +165,6 @@ namespace GameUpdater
                 lblServerStatus.ForeColor = Color.Red;
                 lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                webBrowser1.Visible = false;
             }
         }
 
@@ -194,11 +210,11 @@ namespace GameUpdater
 
                 // Delete the temporary archive file
                 File.Delete(tempFilePath);
+                _ = MessageBox.Show($"New files installed, please check files to proceed.", "Check files..", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to update: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                webBrowser1.Visible = false;
             }
         }
 
@@ -211,8 +227,18 @@ namespace GameUpdater
                     // Download the file hashes JSON from the server
                     var fileHashesJson = client.DownloadString(FileHashesUrl);
 
-                    // Deserialize the JSON array of file hashes into a List<FileHash>
-                    var fileHashes = JsonConvert.DeserializeObject<List<FileHash>>(fileHashesJson);
+                    // Deserialize the JSON object containing file hashes and number of files
+                    dynamic fileHashesData = JsonConvert.DeserializeObject(fileHashesJson);
+
+                    // Check that the required fields are present
+                    if (fileHashesData == null || fileHashesData.FileHashes == null || fileHashesData.NumFiles == null)
+                    {
+                        throw new ArgumentException("Server file hashes JSON data is malformed or missing required fields.\n\nPlease contact support.");
+                    }
+
+                    // Extract the file hashes and number of files from the dynamic object
+                    var fileHashes = fileHashesData.FileHashes.ToObject<List<FileHash>>();
+                    var numFiles = (int)fileHashesData.NumFiles;
 
                     // Loop through each file hash and check if it exists locally and if it has been modified
                     foreach (var fileHash in fileHashes)
@@ -237,21 +263,31 @@ namespace GameUpdater
                         }
                     }
 
-                    // Write updated file hashes to local file
-                    var updatedFileHashesJson = JsonConvert.SerializeObject(fileHashes, Formatting.Indented);
+                    // Write updated file hashes and number of files to local file
+                    var updatedFileHashesJson = JsonConvert.SerializeObject(new { NumFiles = numFiles, FileHashes = fileHashes }, Formatting.Indented);
                     var tempFileHashesPath = FileHashesPath + ".tmp"; // use a temp file to avoid file locking issues
-                    File.WriteAllText(tempFileHashesPath, updatedFileHashesJson);
-                    File.Replace(tempFileHashesPath, FileHashesPath, null); // replace original file with temp file
+
+                    // Create file_hashes.json if it doesn't exist
+                    if (!File.Exists(FileHashesPath))
+                    {
+                        File.WriteAllText(FileHashesPath, updatedFileHashesJson);
+                    }
+                    else
+                    {
+                        // Replace original file with temp file
+                        File.WriteAllText(tempFileHashesPath, updatedFileHashesJson);
+                        File.Replace(tempFileHashesPath, FileHashesPath, null);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to update local file list from server: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                webBrowser1.Visible = false;
-                BTNStart.Enabled = false;
+                //BTNStart.Enabled = false;
                 BTNCheckFiles.Enabled = true;
             }
         }
+
 
         private void BTNCheckFiles_Click(object sender, EventArgs e)
         {
@@ -264,7 +300,7 @@ namespace GameUpdater
                 lblServerStatus.Text = "Checking...";
                 lblServerStatus.BackColor = Color.Transparent;
 
-                BTNStart.Enabled = false;
+                //BTNStart.Enabled = false;
 
                 using (var client = new WebClient())
                 {
@@ -309,7 +345,7 @@ namespace GameUpdater
                     {
                         progressBar.Value = 100;
                         LabelVersionLatest.Text = $"You have the latest version ({currentVersionInfo.LatestVersion}).";
-                        BTNStart.Enabled = true;
+                        //BTNStart.Enabled = true;
                         BTNCheckFiles.Enabled = false;
                         //_ = MessageBox.Show($"You have the latest version (version {currentVersionInfo.LatestVersion}).",
                         //        "No Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -323,7 +359,6 @@ namespace GameUpdater
                 lblServerStatus.ForeColor = Color.Red;
                 lblServerStatus.BackColor = Color.Transparent;
                 MessageBox.Show($"Failed to check for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                webBrowser1.Visible = false;
             }
         }
         private void LaunchGame()
@@ -341,54 +376,15 @@ namespace GameUpdater
             }
         }
 
-        private void BTNStart_Click(object sender, MouseEventArgs e)
+        private void StartButton_Click(object sender, EventArgs e)
         {
-            BTNStart.BackgroundImage = Properties.Resources.start_hover;
-            BTNStart.BackColor = Color.Transparent;
             LaunchGame();
             Environment.Exit(0);
-        }
-
-        private void BTNStart_MouseEnter(object sender, EventArgs e)
-        {
-            BTNStart.BackgroundImage = Properties.Resources.start_hover;
-        }
-
-        private void BTNStart_MouseLeave(object sender, EventArgs e)
-        {
-            BTNStart.BackgroundImage = Properties.Resources.start_normal;
-        }
-        private void BTNStart_MouseOver(object sender, EventArgs e)
-        {
-            BTNStart.BackgroundImage = Properties.Resources.start_hover;
-            BTNStart.Cursor = Cursors.Hand;
-        }
-
-        private void BTNStart_BackColor(object sender, EventArgs e)
-        {
-            BTNStart.BackColor = Color.Transparent;
-        }
-
-        private void BTNCF_MouseOver(object sender, EventArgs e)
-        {
-            BTNCheckFiles.BackgroundImage = Properties.Resources.cf_hover;
-        }
-        private void BTNCF_MouseEnter(object sender, EventArgs e)
-        {
-            BTNCheckFiles.BackgroundImage = Properties.Resources.cf_normal;
         }
 
         private void BTNClose_Click(object sender, EventArgs e)
         {
             Environment.Exit(1);
-        }
-        private void BTNClose_MouseLeave(object sender, EventArgs e)
-        {
-            BTNClose.BackgroundImage = Properties.Resources.close_hover;
-        }
-        private void BTNClose_MouseEnter(object sender, EventArgs e)
-        {
-            BTNClose.BackgroundImage = Properties.Resources.close_normal;
         }
 
         private void Form_MouseDown(object sender, MouseEventArgs e)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
     public static class HashGenerator
     {
-        public static string GenerateHash(string filePath)
+        public static string? GenerateHash(string filePath)
         {
             try
             {
