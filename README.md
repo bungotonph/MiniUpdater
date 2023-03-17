@@ -1,4 +1,4 @@
-# Game Updater
+# Online Game - Mini Updater
 This is a simple game updater that checks for updates on a server and downloads and installs them if necessary. It uses a JSON file to store the list of files on the server, and checks the local files against the server files to determine which files need to be updated.
 
 # Features
